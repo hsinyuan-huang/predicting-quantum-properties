@@ -1,15 +1,17 @@
-# Predicting Many Properties of a Quantum System using Very Few Measurements
+# Predicting Many Properties of a Quantum System from Very Few Measurements
+
+This open source implementation allows the prediction of many local properties: local observables, two-point correlation functions, entanglement entropy, from very few measurements.
 
 We require `g++` and `python` (version 3).
 
-### Step 1:
+### Step 1: Compile the code
 In your terminal, perform the following to compile the C++ codes to executable files:
 ```shell
 > g++ -std=c++0x -O3 data_acquisition_shadow.cpp -o data_acquisition_shadow
 > g++ -std=c++0x -O3 prediction_shadow.cpp -o prediction_shadow
 ```
 
-### Step 2:
+### Step 2: Prepare the measurements
 The executable `data_acquisition_shadow` could be used to produce an efficient measurement scheme for predicting many local properties from very few measurements. There are two ways to use this program:
 
 #### 1. Randomized measurements:
@@ -19,7 +21,7 @@ The executable `data_acquisition_shadow` could be used to produce an efficient m
 This generates random Pauli measurements. There would be `[number of measurements]` repetitions on a system with `[system size]` qubits.
 You may then use this set of randomized measurements to perform the experiment.
 
-###### A concrete example of using the randomized measurements:
+##### A concrete example of using the randomized measurements:
 ```shell
 > ./data_acquisition_shadow -r 5 3
 X X Z
@@ -35,6 +37,8 @@ A random output of 5 measurement repetitions for a system of 3 qubits is outputt
 > ./data_acquisition_shadow -d [measurements per observable] [observable file]
 ```
 If you already know a list of local observables you want to measure, this option creates a derandomized version of the randomized measurement.
+We consider local observables as observables that act on few qubits but do not have to be geometrically local.
+Furthermore, since every local observables could be decomposed to tensor product of Pauli matrices, we only focus on tensor product of Pauli matrices.
 The generated measurement scheme would allow you to measure all the local observables given in `[observable file]` for at least `[measurements per observable]` times.
 **An important note** is that: if we increase `[measurements per observable]`, the ratio `number of measurement repetitions` / `[measurements per observable]` would not be constant, but would actually **decrease**.
 This is because the derandomization procedure would find a more efficient approach to measure the observables.
@@ -47,8 +51,9 @@ An example of a list of local observables could be found in `observables.txt`.
 [k-local] X/Y/Z [ith qubit] X/Y/Z [jth qubit] ...
 ...
 ```
+We consider `[ith qubit]` to take value from `0` to `[number of qubits / system size] - 1`.
 
-###### Concrete Examples of using the derandomized measurements:
+##### Concrete Examples of using the derandomized measurements:
 
 This example consider measuring all the observables in the example file `observable.txt` at least 1 time. The output is the measurement basis for each repetition interleaved with `[Status T: X]`. `T` stands for `T`-th measurement repetitions and `X` stands for the minimum number of measurements in all the observables we hope to predict.
 ```shell
@@ -60,7 +65,7 @@ X X Y X Y Y X Y X Y
 [Status 2: 0]
 X X X X X Y X X Y X
 [Status 3: 0]
-X X X X X X X X X Y
+X X X X X X X X X X
 [Status 4: 1]
 ```
 
@@ -94,23 +99,89 @@ Because the generated measurement schemes could be quite long, we provide the fo
 > ./data_acquisition_shadow -d 100 generated_observables.txt 1> scheme.txt 2> /dev/null
 ```
 
-### Step 3:
-Perform physical experiments using the generated scheme to gather the measurement data. The `[measurement file]` should be structured as follows.
+### Step 3: Perform the measurements
+Perform physical experiments using the generated scheme to gather the measurement data. The `[measurement file]` should be structured as follows. An example of the format is given in `measurement.txt`.
 ```
 [system size]
-[X/Y/Z for qubit 1] [0/1 for qubit 1] ...
-[X/Y/Z for qubit 1] [0/1 for qubit 1] ...
+[X/Y/Z for qubit 1] [-1/1 for qubit 1] ...
+[X/Y/Z for qubit 1] [-1/1 for qubit 1] ...
 ...
 ```
 The first line consists of the number of qubits `[system size]` in the quantum system.
-For each of the following line, it is a single-shot measurement result.
-A single-shot measurement result consists of measuring in X, Y, Z for each qubit, and the corresponding binary measurement outcome.
+A single-shot measurement result is recorded in each of the following lines.
+A single-shot measurement result consists of whether we measure in X, Y, Z-basis for each qubit, and the corresponding binary measurement outcome.
 
 **Advanced tips:**
 In practice, it may be more economic to run the same measurement schemes for multiple times. Our framework / program could also operate properly in such a scenario.
 As the repetition increases, the prediction would also become more accurate.
-However, one should be careful in finding the best ratio between the number of measurement bases and the number of repetitions for each basis.
+However, the ratio between the number of measurement bases (`Nb`) and the number of repetitions (`Nr`) for each basis is an important hyper-parameter that should be properly tuned.
 
+For local observables, when `N = Nb x Nr` is fixed, it is preferred to have `Nr = 1`. However, if changing the bases every time would be less economic, then you could also try a larger `Nr > 1`.
 
+For entanglement entropy, when `N = Nb x Nr` is fixed, `Nr = 1` may no longer be preferable. We should consider `Nr` as a hyper-parameter, and try `Nr = 1, 2, 4, 8, 16, 32, 64, 128, ...` to see which yields the best performance.
 
-### Step 4:
+### Step 4: Predict physical properties
+The executable `prediction_shadow` could be used to predict many local properties from the measurement data obtained in Step 3. There are two ways to use this program:
+
+#### 1. Local observables:
+```shell
+> ./prediction_shadow -o [measurement.txt] [observable.txt]
+```
+This command allows the prediction of local observables, where the observables act on few qubits but do not have to be geometrically local.
+The prediction is based on the measurement data `[measurement.txt]` obtained in Step 3. An example of the measurement txt file is given in `measurement.txt`.
+The local observables are given in `[observable.txt]`. The format can be found in Step 1. An example of the observable txt file is given in `observables.txt`.
+
+##### A concrete example for predicting local observables:
+```shell
+> ./prediction_shadow -o measurement.txt observables.txt
+0.049015
+0.006748
+0.014625
+-0.005204
+0.017512
+-0.024036
+-0.022046
+-0.002698
+-0.038271
+0.003201
+-0.023298
+-0.003155
+-0.003189
+0.002247
+1.000000
+1.000000
+```
+This predicts 16 local observables given in `observables.txt` from the randomized measurements given in `measurement.txt`.
+The randomized measurements are performed on a system of 10 qubits, where two consecutive qubits form [a singlet state](https://en.wikipedia.org/wiki/Singlet_state) (a total of 5 singlet states).
+
+#### 2. Subsystem entanglement entropy:
+```shell
+> ./prediction_shadow -e [measurement.txt] [subsystem.txt]
+```
+This command allows the prediction of subsystem entanglement entropy. In particular, we output [Renyi entropy of order 2](https://en.wikipedia.org/wiki/R%C3%A9nyi_entropy).
+`[measurement.txt]` is the measurement data obtained in Step 3. An example of the measurement txt file is given in `measurement.txt`.
+`[subsystem.txt]` contains a list of subsystems that we want to predict their entanglement entropy. The format of `[subsystem.txt]` is
+```
+[system size]
+[subsystem 1 size] [position of qubit 1] [position of qubit 2] ...
+[subsystem 2 size] [position of qubit 1] [position of qubit 2] ...
+```
+The first line `[system size]` indicates the number of qubits in the entire system.
+In each of the following line, we specify one subsystem.
+`[subsystem T size]` is the size of the `T`-th subsystem.
+Then we specify what are the positions for the qubits in the `T`-th subsystem. `[position of qubit X]` is the position of the `X`-th qubit in the subsystem.
+An example can be found in `subsystems.txt`.
+
+##### A concrete example for predicting local observables:
+
+```shell
+> ./prediction_shadow -e measurement.txt subsystems.txt
+0.000000
+2.000000
+0.000277
+1.996378
+1.035726
+0.003031
+```
+This predicts the entanglement entropy for six subsystems given in `subsystems.txt` from the randomized measurements given in `measurement.txt`.
+The randomized measurements are performed on a system of 10 qubits, where two consecutive qubits form [a singlet state](https://en.wikipedia.org/wiki/Singlet_state) (a total of 5 singlet states).

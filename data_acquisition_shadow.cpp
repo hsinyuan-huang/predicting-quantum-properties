@@ -168,7 +168,6 @@ int main(int argc, char* argv[]){
     //
     else if(strcmp(argv[1], "-d") == 0){
         read_all_observables(argv[3]);
-        printf("%d\n", number_of_observables);
 
         //
         // Precompute some constants for efficient usage in the derandomization process
@@ -185,10 +184,6 @@ int main(int argc, char* argv[]){
         //
         // Derandomized version of classical shadows
         //
-        double cur_fail_prob = 0;
-        for(int i = 0; i < (int)observables.size(); i++)
-            cur_fail_prob += fail_prob_pessimistic(0, observables[i].size());
-        printf("%f\n", cur_fail_prob);
 
         // For every observable,
         // how many times the observable has been measured

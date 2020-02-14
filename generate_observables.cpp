@@ -1,7 +1,7 @@
 #include <cstdio>
 using namespace std;
 
-int system_size = 40;
+int system_size = 20;
 
 int main(){
     freopen("generated_observables.txt", "w", stdout);

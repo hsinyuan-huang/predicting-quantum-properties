@@ -1,6 +1,6 @@
 observable_file = open('generated_observables.txt', 'w')
 
-system_size = 40
+system_size = 20
 print(system_size, file = observable_file)
 
 for i in range(system_size - 1):
