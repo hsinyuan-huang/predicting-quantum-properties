@@ -1,6 +1,6 @@
 # Predicting Many Properties of a Quantum System from Very Few Measurements
 
-This open source implementation allows the prediction of many local properties: local observables, two-point correlation functions, entanglement entropy, from very few measurements.
+This open source implementation allows the prediction of many properties: few-body observables, two-point correlation functions, subsystem entanglement entropy, from very few measurements.
 
 We require `g++` (`python` version 3 is optional).
 
