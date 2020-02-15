@@ -4,6 +4,8 @@ This open source implementation allows the prediction of many properties: few-bo
 
 We require `g++` (`python` version 3 is optional).
 
+On the experimental side, we require **single-qubit Pauli measurements** (i.e., each measurement measures all qubits in some Pauli X, Y, or Z- basis). This should be readily available in most quantum machines.
+
 ### Quick Start
 
 ```shell
