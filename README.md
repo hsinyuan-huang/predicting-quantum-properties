@@ -2,7 +2,7 @@
 
 This open source implementation allows the prediction of many local properties: local observables, two-point correlation functions, entanglement entropy, from very few measurements.
 
-We require `g++` and `python` (version 3).
+We require `g++` or `python` (version 3).
 
 ### Step 1: Compile the code
 In your terminal, perform the following to compile the C++ codes to executable files:
