@@ -4,6 +4,29 @@ This open source implementation allows the prediction of many local properties: 
 
 We require `g++` (`python` version 3 is optional).
 
+### Quick Start
+
+```shell
+# Compile the codes
+> g++ -std=c++0x -O3 data_acquisition_shadow.cpp -o data_acquisition_shadow
+> g++ -std=c++0x -O3 prediction_shadow.cpp -o prediction_shadow
+
+# Generate observables you want to predict
+> g++ -O3 -std=c++0x generate_observables.cpp -o generate_observables
+> ./generate_observables
+
+# Create measurement scheme (stored in scheme.txt) using derandomized version of classical shadows
+> ./data_acquisition_shadow -d 100 generated_observables.txt 1> scheme.txt
+
+# Do the physical experiments
+# Store the data in measurement.txt
+
+# Predicting many few-body observables
+> ./prediction_shadow -o measurement.txt observables.txt
+# Predicting many subsystem entanglement entropy
+> ./prediction_shadow -e measurement.txt subsystems.txt
+```
+
 ### Step 1: Compile the code
 In your terminal, perform the following to compile the C++ codes to executable files:
 ```shell
