@@ -195,7 +195,7 @@ In each of the following line, we specify one subsystem.
 Then we specify what are the positions for the qubits in the `T`-th subsystem. `[position of qubit X]` is the position of the `X`-th qubit in the subsystem.
 An example can be found in `subsystems.txt`.
 
-##### A concrete example for predicting local observables:
+##### A concrete example for predicting entanglement entropy:
 
 ```shell
 > ./prediction_shadow -e measurement.txt subsystems.txt
