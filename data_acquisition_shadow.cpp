@@ -173,7 +173,7 @@ int main(int argc, char* argv[]){
         // Precompute some constants for efficient usage in the derandomization process
         //
         double expm1eta = expm1(-eta / 2); // expm1eta = e^(-eta / 2) - 1
-        for(int k = 0; k < max_k_local; k++)
+        for(int k = 0; k < max_k_local+1; k++)
             log1ppow1o3k.push_back(log1p(pow(1.0/3.0, k) * expm1eta));
 
         //
