@@ -11,8 +11,10 @@ import math
 
 def randomized_classical_shadow(num_total_measurements, system_size):
     #
-    # num_total_measurements: int for the total number of measurement rounds
-    # system_size: int for how many qubits in the quantum system
+    # Implementation of the randomized classical shadow
+    #
+    #    num_total_measurements: int for the total number of measurement rounds
+    #    system_size: int for how many qubits in the quantum system
     #
     measurement_procedure = []
     for t in range(num_total_measurements):
@@ -22,13 +24,15 @@ def randomized_classical_shadow(num_total_measurements, system_size):
 
 def derandomized_classical_shadow(all_observables, num_of_measurements_per_observable, system_size, weight=None):
     #
-    # all_observables: a list of Pauli observables, each Pauli observable is a list of tuple
-    #                  of the form ("X", position) or ("Y", position) or ("Z", position)
-    # num_of_measurements_per_observable: int for the number of measurement for each observable
-    # system_size: int for how many qubits in the quantum system
-    # weight: None or a list of coefficients for each observable
-    #         None -- neglect this parameter
-    #         a list -- modify the number of measurements for each observable by the corresponding weight
+    # Implementation of the derandomized classical shadow
+    #
+    #     all_observables: a list of Pauli observables, each Pauli observable is a list of tuple
+    #                      of the form ("X", position) or ("Y", position) or ("Z", position)
+    #     num_of_measurements_per_observable: int for the number of measurement for each observable
+    #     system_size: int for how many qubits in the quantum system
+    #     weight: None or a list of coefficients for each observable
+    #             None -- neglect this parameter
+    #             a list -- modify the number of measurements for each observable by the corresponding weight
     #
     if weight is None:
         weight = [1.0] * len(all_observables)
@@ -121,6 +125,9 @@ def derandomized_classical_shadow(all_observables, num_of_measurements_per_obser
 
     return measurement_procedure
 
+#
+# The following code is only used when we run this code through the command line interface
+#
 if __name__ == "__main__":
     def print_usage():
         print("Usage:\n", file=sys.stderr)
