@@ -10,7 +10,7 @@ An introduction to this procedure and the underlying theory can be found in our 
 
 ### Quick Start
 
-The following is for using a command line interface to run the C++ implementation.
+The following is for using a command line interface to run the C++ implementation. The most important code in this repo is the creation of measurement schemes, see `data_acquisition_shadow.cpp` or `data_acquisition_shadow.py`.
 
 ```shell
 # Compile the codes
@@ -33,7 +33,7 @@ The following is for using a command line interface to run the C++ implementatio
 > ./prediction_shadow -e measurement.txt subsystems.txt
 ```
 
-Since many people are using Python, we have also implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp`. The purpose of this code is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
+Since many people are using Python, we have implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp`. The purpose of this code is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
 ```shell
 > python data_acquisition_shadow.py -d 10 observables.txt
 ```
