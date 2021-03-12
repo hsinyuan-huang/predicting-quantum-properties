@@ -2,13 +2,15 @@
 
 This open source implementation allows the prediction of many properties: few-body observables, two-point correlation functions, subsystem entanglement entropy, from very few measurements.
 
-We require `g++` (`python` version 3 is optional).
+We require `g++` and `python` version 3.
 
 On the experimental side, we require **single-qubit Pauli measurements** (i.e., each measurement measures all qubits in some Pauli X, Y, or Z- basis). This should be readily available in most quantum machines.
 
 An introduction to this procedure and the underlying theory can be found in our paper: https://scirate.com/arxiv/2002.08953, https://www.nature.com/articles/s41567-020-0932-7.
 
 ### Quick Start
+
+The following is for using a command line interface to run the C++ implementation.
 
 ```shell
 # Compile the codes
@@ -29,6 +31,21 @@ An introduction to this procedure and the underlying theory can be found in our 
 > ./prediction_shadow -o measurement.txt observables.txt
 # Predicting many subsystem entanglement entropy
 > ./prediction_shadow -e measurement.txt subsystems.txt
+```
+
+Since many people are using Python, we have also implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp`. The purpose of this code is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
+```shell
+> python data_acquisition_shadow.py -d 10 observables.txt
+```
+or by importing into a Python code
+```python
+import data_acquisition_shadow
+
+# randomized classical shadow consisting of 100 parallel measurements in a 20-qubit system
+measurement_procedure = data_acquisition_shadow.randomized_classical_shadow(100, 20)
+
+# measurement_procedure = [a list of 100 parallel measurements, each being [a list of 20 single-qubit Pauli bases]]
+print(measurement_procedure)
 ```
 
 ### Step 1: Compile the code
