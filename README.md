@@ -6,7 +6,7 @@ We require `g++` and `python` version 3.
 
 On the experimental side, we require **single-qubit Pauli measurements** (i.e., each measurement measures all qubits in some Pauli X, Y, or Z- basis). This should be readily available in most quantum machines.
 
-An introduction to this procedure and the underlying theory can be found in our paper: https://scirate.com/arxiv/2002.08953, https://www.nature.com/articles/s41567-020-0932-7.
+An introduction to this procedure and the underlying theory can be found in our paper: https://arxiv.org/abs/2103.07510, https://arxiv.org/abs/2002.08953, https://www.nature.com/articles/s41567-020-0932-7.
 
 ### Quick Start
 
