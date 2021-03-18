@@ -33,19 +33,25 @@ The following is for using a command line interface to run the C++ implementatio
 > ./prediction_shadow -e measurement.txt subsystems.txt
 ```
 
-Since many people are using Python, we have implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp`. The purpose of this code is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
+Since many people are using Python, we have implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp` and `prediction_shadow.py` which is the Python version of `prediction_shadow.cpp`. The purpose of the two codes is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
 ```shell
 > python data_acquisition_shadow.py -d 10 observables.txt
+> python prediction_shadow.py -o measurement.txt observables.txt
 ```
 or by importing into a Python code
 ```python
 import data_acquisition_shadow
+import prediction_shadow
 
 # randomized classical shadow consisting of 100 parallel measurements in a 20-qubit system
 measurement_procedure = data_acquisition_shadow.randomized_classical_shadow(100, 20)
 
 # measurement_procedure = [a list of 100 parallel measurements, each being [a list of 20 single-qubit Pauli bases]]
 print(measurement_procedure)
+
+# full_measurement = [a list of [list of (XYZ basis, +-1 outcome) for each qubit]]
+# one_observable = [a list of (Pauli-XYZ, index for the qubit)]
+estimate_exp(full_measurement, one_observable)
 ```
 
 ### Step 1: Compile the code
