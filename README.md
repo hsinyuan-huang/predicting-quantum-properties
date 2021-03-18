@@ -97,6 +97,15 @@ An example of a list of local observables could be found in `observables.txt`.
 ```
 We consider `[ith qubit]` to take value from `0` to `[number of qubits / system size] - 1`.
 
+One could also consider Pauli observables with weights given as follows.
+```
+[number of qubits / system size]
+[k-local] X/Y/Z [ith qubit] X/Y/Z [jth qubit] ... [weight]
+[k-local] X/Y/Z [ith qubit] X/Y/Z [jth qubit] ... [weight]
+...
+```
+We consider `[weight]` to be a floating point number in between `0.0` to `1.0`. A smaller weight means the observable is less important and will be measured less often in the derandomization procedure.
+
 ##### Concrete Examples of using the derandomized measurements:
 
 This example consider measuring all the observables in the example file `observable.txt` at least 1 time. The output is the measurement basis for each repetition interleaved with `[Status T: X]`. `T` stands for `T`-th measurement repetitions and `X` stands for the minimum number of measurements in all the observables we hope to predict.
