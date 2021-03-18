@@ -31,6 +31,8 @@ int max_k_local;
 //
 vector<vector<pair<int, int> > > observables; // observables to predict
 vector<vector<vector<int> > > observables_acting_on_ith_qubit;
+vector<double> observables_weight;
+
 void read_all_observables(char* observable_file_name){
     ifstream observable_fstream;
     observable_fstream.open(observable_file_name, ifstream::in);
@@ -88,6 +90,13 @@ void read_all_observables(char* observable_file_name){
             ith_observable.push_back(make_pair(position_of_pauli, pauli_encoding));
         }
 
+        double weight;
+        int X = single_line_stream.rdbuf()->in_avail();
+        if(X == 0) weight = 1.0;
+        else single_line_stream >> weight;
+
+        observables_weight.push_back(weight);
+
         observables.push_back(ith_observable);
         observable_counter ++;
     }
@@ -119,14 +128,14 @@ void print_usage(){
 // which is used in derandomizing the random Pauli measurement for classical shadows.
 //
 vector<double> log1ppow1o3k; // log1ppow1o3k[k] = log(1 + (e^(-eta / 2) - 1) / 3^k)
-double fail_prob_pessimistic(int cur_num_of_measurements, int how_many_pauli_to_match){ // stands for "failure probability by pessimistic estimator"
+double fail_prob_pessimistic(int cur_num_of_measurements, int how_many_pauli_to_match, double weight){ // stands for "failure probability by pessimistic estimator"
     double log1pp0 = (how_many_pauli_to_match < INF? log1ppow1o3k[how_many_pauli_to_match] : 0.0);
 
-    if(number_of_measurements_per_observable <= cur_num_of_measurements)
+    if(floor(weight * number_of_measurements_per_observable) <= cur_num_of_measurements)
         return 0;
 
     double log_value = -eta / 2 * cur_num_of_measurements + log1pp0;
-    return 2 * exp(log_value);
+    return 2 * exp(log_value / weight);
 }
 
 int main(int argc, char* argv[]){
@@ -217,13 +226,13 @@ int main(int argc, char* argv[]){
                         for(int i : observables_acting_on_ith_qubit[ith_qubit][p]){
                             if(pauli == p){
                                 int pauli_to_match_next_step = how_many_pauli_to_match[i] == INF? INF: how_many_pauli_to_match[i]-1;
-                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], pauli_to_match_next_step);
-                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i]);
+                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], pauli_to_match_next_step, observables_weight[i]);
+                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i], observables_weight[i]);
                                 prob_of_failure[pauli] += prob_next_step - prob_current_step;
                             }
                             else{
-                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], INF);
-                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i]);
+                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], INF, observables_weight[i]);
+                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i], observables_weight[i]);
                                 prob_of_failure[pauli] += prob_next_step - prob_current_step;
                             }
                         }
@@ -261,14 +270,15 @@ int main(int argc, char* argv[]){
                 if(how_many_pauli_to_match[i] == 0) cur_num_of_measurements[i] ++;
 
             //
-            // Check the minimum number of measurements for all the observables
+            // Check the number of measurements for all the observables
             //
-            int minimum_number_of_measurements = INF;
+            int success = 0;
             for(int i = 0; i < (int)observables.size(); i++)
-                minimum_number_of_measurements = min(minimum_number_of_measurements, cur_num_of_measurements[i]);
-            fprintf(stderr, "[Status %d: %d]\n", measurement_repetition+1, minimum_number_of_measurements);
+                if(cur_num_of_measurements[i] >= floor(observables_weight[i] * number_of_measurements_per_observable))
+                    success += 1;
+            fprintf(stderr, "[Status %d: %d]\n", measurement_repetition+1, success);
 
-            if(minimum_number_of_measurements == number_of_measurements_per_observable) break;
+            if(success == (int)observables.size()) break;
         }
     }
 }
