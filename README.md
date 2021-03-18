@@ -53,6 +53,7 @@ print(measurement_procedure)
 # one_observable = [a list of (Pauli-XYZ, index for the qubit)]
 estimate_exp(full_measurement, one_observable)
 ```
+Currently, `prediction_shadow.py` only support the `-o` option for prediction expectation value of observables.
 
 ### Step 1: Compile the code
 In your terminal, perform the following to compile the C++ codes to executable files:
