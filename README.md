@@ -6,11 +6,11 @@ We require `g++` and `python` version 3.
 
 On the experimental side, we require **single-qubit Pauli measurements** (i.e., each measurement measures all qubits in some Pauli X, Y, or Z- basis). This should be readily available in most quantum machines.
 
-An introduction to this procedure and the underlying theory can be found in our paper: https://scirate.com/arxiv/2002.08953, https://www.nature.com/articles/s41567-020-0932-7.
+An introduction to this procedure and the underlying theory can be found in our paper: https://arxiv.org/abs/2103.07510, https://arxiv.org/abs/2002.08953, https://www.nature.com/articles/s41567-020-0932-7.
 
 ### Quick Start
 
-The following is for using a command line interface to run the C++ implementation.
+The following is for using a command line interface to run the C++ implementation. The most important code in this repo is the creation of measurement schemes, see `data_acquisition_shadow.cpp` or `data_acquisition_shadow.py`.
 
 ```shell
 # Compile the codes
@@ -33,7 +33,7 @@ The following is for using a command line interface to run the C++ implementatio
 > ./prediction_shadow -e measurement.txt subsystems.txt
 ```
 
-Since many people are using Python, we have also implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp`. The purpose of this code is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
+Since many people are using Python, we have implemented `data_acquisition_shadow.py` which is the Python version of `data_acquisition_shadow.cpp`. The purpose of this code is only to facilitate understanding of the procedure and it could be orders of magnitude slower than the C++ implementation. It can be used through the command line interface
 ```shell
 > python data_acquisition_shadow.py -d 10 observables.txt
 ```
@@ -96,6 +96,15 @@ An example of a list of local observables could be found in `observables.txt`.
 ...
 ```
 We consider `[ith qubit]` to take value from `0` to `[number of qubits / system size] - 1`.
+
+One could also consider Pauli observables with weights given as follows.
+```
+[number of qubits / system size]
+[k-local] X/Y/Z [ith qubit] X/Y/Z [jth qubit] ... [weight]
+[k-local] X/Y/Z [ith qubit] X/Y/Z [jth qubit] ... [weight]
+...
+```
+We consider `[weight]` to be a floating point number in between `0.0` to `1.0`. A smaller weight means the observable is less important and will be measured less often in the derandomization procedure.
 
 ##### Concrete Examples of using the derandomized measurements:
 
