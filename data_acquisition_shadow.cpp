@@ -11,6 +11,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 #include <sstream>
 #include <utility>
 #include <algorithm>
