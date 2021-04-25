@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 #include <utility>
 #include <algorithm>
 
