@@ -38,9 +38,15 @@ def derandomized_classical_shadow(all_observables, num_of_measurements_per_obser
         weight = [1.0] * len(all_observables)
     assert(len(weight) == len(all_observables))
 
-    def cost_function(num_of_measurements_so_far, num_of_matches_needed_in_this_round):
+    sum_log_value = 0
+    sum_cnt = 0
+
+    def cost_function(num_of_measurements_so_far, num_of_matches_needed_in_this_round, shift = 0):
         eta = 0.9 # a hyperparameter subject to change
         nu = 1 - math.exp(-eta / 2)
+
+        nonlocal sum_log_value
+        nonlocal sum_cnt
 
         cost = 0
         for i, zipitem in enumerate(zip(num_of_measurements_so_far, num_of_matches_needed_in_this_round)):
@@ -52,7 +58,11 @@ def derandomized_classical_shadow(all_observables, num_of_measurements_per_obser
                 V = eta / 2 * measurement_so_far
             else:
                 V = eta / 2 * measurement_so_far - math.log(1 - nu / (3 ** matches_needed))
-            cost += math.exp(-V / weight[i])
+            cost += math.exp(-V / weight[i] - shift)
+
+            sum_log_value += V / weight[i]
+            sum_cnt += 1
+
         return cost
 
     def match_up(qubit_i, dice_roll_pauli, single_observable):
@@ -74,6 +84,10 @@ def derandomized_classical_shadow(all_observables, num_of_measurements_per_obser
         num_of_matches_needed_in_this_round = [len(P) for P in all_observables]
         single_round_measurement = []
 
+        shift = sum_log_value / sum_cnt if sum_cnt > 0 else 0;
+        sum_log_value = 0.0
+        sum_cnt = 0
+
         for qubit_i in range(system_size):
             cost_of_outcomes = dict([("X", 0), ("Y", 0), ("Z", 0)])
 
@@ -86,7 +100,7 @@ def derandomized_classical_shadow(all_observables, num_of_measurements_per_obser
                     if result == 1:
                         num_of_matches_needed_in_this_round[i] -= 1 # match up one Pauli X/Y/Z
 
-                cost_of_outcomes[dice_roll_pauli] = cost_function(num_of_measurements_so_far, num_of_matches_needed_in_this_round)
+                cost_of_outcomes[dice_roll_pauli] = cost_function(num_of_measurements_so_far, num_of_matches_needed_in_this_round, shift=shift)
 
                 # Revert the dice roll
                 for i, single_observable in enumerate(all_observables):
@@ -131,12 +145,12 @@ def derandomized_classical_shadow(all_observables, num_of_measurements_per_obser
 if __name__ == "__main__":
     def print_usage():
         print("Usage:\n", file=sys.stderr)
-        print("./shadow_data_acquisition -d [number of measurements per observable] [observable.txt]", file=sys.stderr)
+        print("python3 data_acquisition_shadow -d [number of measurements per observable] [observable.txt]", file=sys.stderr)
         print("    This is the derandomized version of classical shadow.", file=sys.stderr)
         print("    We would output a list of Pauli measurements to measure all observables", file=sys.stderr)
         print("    in [observable.txt] for at least [number of measurements per observable] times.", file=sys.stderr)
         print("<or>\n", file=sys.stderr)
-        print("./shadow_data_acquisition -r [number of total measurements] [system size]", file=sys.stderr)
+        print("python3 data_acquisition_shadow -r [number of total measurements] [system size]", file=sys.stderr)
         print("    This is the randomized version of classical shadow.", file=sys.stderr)
         print("    We would output a list of Pauli measurements for the given [system size]", file=sys.stderr)
         print("    with a total of [number of total measurements] repetitions.", file=sys.stderr)

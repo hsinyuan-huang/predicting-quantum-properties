@@ -129,7 +129,8 @@ void print_usage(){
 // which is used in derandomizing the random Pauli measurement for classical shadows.
 //
 vector<double> log1ppow1o3k; // log1ppow1o3k[k] = log(1 + (e^(-eta / 2) - 1) / 3^k)
-double sum_log_value = 0.0, sum_cnt = 0.0;
+double sum_log_value = 0.0;
+int sum_cnt = 0.0;
 double fail_prob_pessimistic(int cur_num_of_measurements, int how_many_pauli_to_match, double weight, double shift){ // stands for "failure probability by pessimistic estimator"
     double log1pp0 = (how_many_pauli_to_match < INF? log1ppow1o3k[how_many_pauli_to_match] : 0.0);
 
@@ -215,9 +216,9 @@ int main(int argc, char* argv[]){
             for(int i = 0; i < (int)observables.size(); i++)
                 how_many_pauli_to_match[i] = observables[i].size(); // initialize to k for k-local observable
 
-            double shift = sum_log_value / sum_cnt;
+            double shift = (sum_cnt == 0)? 0: sum_log_value / sum_cnt;
             sum_log_value = 0.0;
-            sum_cnt = 0.0;
+            sum_cnt = 0;
 
             for(int ith_qubit = 0; ith_qubit < system_size; ith_qubit++){
                 double prob_of_failure[3]; // for choosing X, Y, or Z
