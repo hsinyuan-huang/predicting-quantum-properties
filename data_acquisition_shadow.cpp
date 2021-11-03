@@ -129,14 +129,17 @@ void print_usage(){
 // which is used in derandomizing the random Pauli measurement for classical shadows.
 //
 vector<double> log1ppow1o3k; // log1ppow1o3k[k] = log(1 + (e^(-eta / 2) - 1) / 3^k)
-double fail_prob_pessimistic(int cur_num_of_measurements, int how_many_pauli_to_match, double weight){ // stands for "failure probability by pessimistic estimator"
+double sum_log_value = 0.0, sum_cnt = 0.0;
+double fail_prob_pessimistic(int cur_num_of_measurements, int how_many_pauli_to_match, double weight, double shift){ // stands for "failure probability by pessimistic estimator"
     double log1pp0 = (how_many_pauli_to_match < INF? log1ppow1o3k[how_many_pauli_to_match] : 0.0);
 
     if(floor(weight * number_of_measurements_per_observable) <= cur_num_of_measurements)
         return 0;
 
     double log_value = -eta / 2 * cur_num_of_measurements + log1pp0;
-    return 2 * exp(log_value / weight);
+    sum_log_value += (log_value / weight);
+    sum_cnt ++;
+    return 2 * exp((log_value / weight) - shift);
 }
 
 int main(int argc, char* argv[]){
@@ -212,6 +215,10 @@ int main(int argc, char* argv[]){
             for(int i = 0; i < (int)observables.size(); i++)
                 how_many_pauli_to_match[i] = observables[i].size(); // initialize to k for k-local observable
 
+            double shift = sum_log_value / sum_cnt;
+            sum_log_value = 0.0;
+            sum_cnt = 0.0;
+
             for(int ith_qubit = 0; ith_qubit < system_size; ith_qubit++){
                 double prob_of_failure[3]; // for choosing X, Y, or Z
                 double smallest_prob_of_failure = -1;
@@ -227,13 +234,13 @@ int main(int argc, char* argv[]){
                         for(int i : observables_acting_on_ith_qubit[ith_qubit][p]){
                             if(pauli == p){
                                 int pauli_to_match_next_step = how_many_pauli_to_match[i] == INF? INF: how_many_pauli_to_match[i]-1;
-                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], pauli_to_match_next_step, observables_weight[i]);
-                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i], observables_weight[i]);
+                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], pauli_to_match_next_step, observables_weight[i], shift);
+                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i], observables_weight[i], shift);
                                 prob_of_failure[pauli] += prob_next_step - prob_current_step;
                             }
                             else{
-                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], INF, observables_weight[i]);
-                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i], observables_weight[i]);
+                                double prob_next_step = fail_prob_pessimistic(cur_num_of_measurements[i], INF, observables_weight[i], shift);
+                                double prob_current_step = fail_prob_pessimistic(cur_num_of_measurements[i], how_many_pauli_to_match[i], observables_weight[i], shift);
                                 prob_of_failure[pauli] += prob_next_step - prob_current_step;
                             }
                         }
