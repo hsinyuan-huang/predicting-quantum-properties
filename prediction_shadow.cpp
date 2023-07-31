@@ -268,7 +268,7 @@ int main(int argc, char* argv[]){
                 fprintf(stderr, "%d-th Observable is not measured at all\n", i+1);
                 printf("0\n");
             }
-            printf("%f\n", 1.0 * sum_of_measurement_results[i] / number_of_measurements[i]);
+            else printf("%f\n", 1.0 * sum_of_measurement_results[i] / number_of_measurements[i]);
         }
     }
     //
